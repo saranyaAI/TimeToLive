@@ -19,15 +19,13 @@ public class TimeToLive {
     static HashMap<String, DNSEntry> dnsCache = new HashMap<>();
     static int hits = 0, misses = 0;
 
- UC3-Network
     // Simulated upstream DNS lookup
     static String queryUpstream(String domain) {
         return "10.0.0.25";
-=======
+
     // Simulated upstream DNS query
     static String queryUpstream(String domain) {
         return "192.168.1.100";
- main
     }
 
     static void resolve(String domain) {
@@ -49,17 +47,14 @@ public class TimeToLive {
         misses++;
         String ip = queryUpstream(domain);
 
-UC3-Network
         dnsCache.put(domain, new DNSEntry(ip, 180));
 
         System.out.println("resolve(\"" + domain + "\") → Cache MISS → Query upstream → "
                 + ip + " (TTL: 180s)");
-=======
         cache.put(domain, new DNSEntry(ip, 120));
 
         System.out.println("resolve(\"" + domain + "\") → Cache MISS → Query upstream → "
                 + ip + " (TTL: 120s)");
- main
     }
 
     static void getCacheStats() {
