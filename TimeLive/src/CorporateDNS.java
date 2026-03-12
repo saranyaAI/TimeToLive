@@ -14,21 +14,21 @@ class DNSEntry {
     }
 }
 
-public class TimeToLive {
+public class CorporateDNS {
 
-    static HashMap<String, DNSEntry> cache = new HashMap<>();
+    static HashMap<String, DNSEntry> dnsCache = new HashMap<>();
     static int hits = 0, misses = 0;
 
-    // Simulated upstream DNS query
+    // Simulated upstream DNS lookup
     static String queryUpstream(String domain) {
-        return "192.168.1.100";
+        return "10.0.0.25";
     }
 
     static void resolve(String domain) {
 
-        if (cache.containsKey(domain)) {
+        if (dnsCache.containsKey(domain)) {
 
-            DNSEntry entry = cache.get(domain);
+            DNSEntry entry = dnsCache.get(domain);
 
             if (!entry.isExpired()) {
                 hits++;
@@ -36,34 +36,34 @@ public class TimeToLive {
                 return;
             } else {
                 System.out.println("resolve(\"" + domain + "\") → Cache EXPIRED");
-                cache.remove(domain);
+                dnsCache.remove(domain);
             }
         }
 
         misses++;
         String ip = queryUpstream(domain);
 
-        cache.put(domain, new DNSEntry(ip, 120));
+        dnsCache.put(domain, new DNSEntry(ip, 180));
 
         System.out.println("resolve(\"" + domain + "\") → Cache MISS → Query upstream → "
-                + ip + " (TTL: 120s)");
+                + ip + " (TTL: 180s)");
     }
 
     static void getCacheStats() {
 
         int total = hits + misses;
-        double hitRate = total == 0 ? 0 : (hits * 100.0 / total);
+        double hitRate = (total == 0) ? 0 : (hits * 100.0 / total);
 
         System.out.println("Cache Hit Rate: " + hitRate + "%");
     }
 
     public static void main(String[] args) {
 
-        resolve("cdn.netflix.com");
-        resolve("cdn.netflix.com");
+        resolve("intranet.company.com");
+        resolve("intranet.company.com");
 
-        resolve("images.amazon.com");
-        resolve("cdn.netflix.com");
+        resolve("mail.company.com");
+        resolve("intranet.company.com");
 
         getCacheStats();
     }
