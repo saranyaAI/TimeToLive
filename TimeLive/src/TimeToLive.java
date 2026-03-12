@@ -13,13 +13,15 @@ class DNSEntry {
         return System.currentTimeMillis() > expiryTime;
     }
 }
+
 public class TimeToLive {
 
     static HashMap<String, DNSEntry> cache = new HashMap<>();
     static int hits = 0, misses = 0;
 
+    // Simulated upstream DNS query
     static String queryUpstream(String domain) {
-        return "172.217.14.206"; // simulated IP
+        return "192.168.1.100";
     }
 
     static void resolve(String domain) {
@@ -41,26 +43,28 @@ public class TimeToLive {
         misses++;
         String ip = queryUpstream(domain);
 
-        cache.put(domain, new DNSEntry(ip, 300));
+        cache.put(domain, new DNSEntry(ip, 120));
 
-        System.out.println("resolve(\"" + domain + "\") → Cache MISS → Query upstream → " + ip + " (TTL: 300s)");
+        System.out.println("resolve(\"" + domain + "\") → Cache MISS → Query upstream → "
+                + ip + " (TTL: 120s)");
     }
 
-    static void getStats() {
-        int total = hits + misses;
-        double rate = (total == 0) ? 0 : (hits * 100.0 / total);
+    static void getCacheStats() {
 
-        System.out.println("Hit Rate: " + rate + "%");
+        int total = hits + misses;
+        double hitRate = total == 0 ? 0 : (hits * 100.0 / total);
+
+        System.out.println("Cache Hit Rate: " + hitRate + "%");
     }
 
     public static void main(String[] args) {
 
-        resolve("google.com");
-        resolve("google.com");
+        resolve("cdn.netflix.com");
+        resolve("cdn.netflix.com");
 
-        resolve("openai.com");
-        resolve("google.com");
+        resolve("images.amazon.com");
+        resolve("cdn.netflix.com");
 
-        getStats();
+        getCacheStats();
     }
 }
